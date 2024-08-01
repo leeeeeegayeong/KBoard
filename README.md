@@ -9,7 +9,6 @@
   <li><a>실행 화면</a></li>
   <li><a>패키지 구조</a></li>
   <li><a>DB 설계</a></li>
-  <li><a>API 설계</a></li>
   <li><a>개발 내용</a></li>
   <li><a>후기</a></li>
 </ul><br/><br/>
@@ -201,3 +200,90 @@
 
 <br/>
 <h1>DB 설계</h1>
+<img width="1080" alt="스크린샷 2024-08-01 오후 12 48 48" src="https://github.com/user-attachments/assets/1cce25be-36c4-40ae-9de2-a9d29527a980">
+
+<h3>1. 테이블 설명</h3>
+<p>attachment</p>
+<ul>
+  <li>id (INT, PK, AI): 첨부 파일의 고유 ID</li>
+  <li>post_id (INT, FK): 게시물 ID, t5_post 테이블과의 외래 키 관계</li>
+  <li>sourcename (VARCHAR(100)): 원본 파일 이름</li>
+  <li>filename (VARCHAR(100)): 서버에 저장된 파일 이름</li>
+</ul>
+
+<p>authority</p>
+<ul>
+  <li>id (INT, PK, AI): 권한의 고유 ID</li>
+  <li>name (VARCHAR(40), UNIQUE): 권한 이름</li>
+</ul>
+
+<p>comment</p>
+<ul>
+  <li>id (INT, PK, AI): 댓글의 고유 ID</li>
+  <li>user_id (INT, FK): 댓글 작성자 ID, t5_user 테이블과의 외래 키 관계</li>
+  <li>post_id (INT, FK): 댓글이 달린 게시물의 ID, t5_post 테이블과의 외래 키 관계</li>
+  <li>content (TEXT): 댓글 내용</li>
+  <li>regdate (DATETIME, DEFAULT NOW()): 댓글 작성 날짜 및 시간</li>
+</ul>
+
+<p>post</p>
+<ul>
+  <li>id (INT, PK, AI): 게시물의 고유 ID</li>
+  <li>user_id (INT, FK): 작성자 ID, t5_user 테이블과의 외래 키 관계</li>
+  <li>subject (VARCHAR(200)): 게시물 제목</li>
+  <li>content (LONGTEXT): 게시물 내용</li>
+  <li>viewcnt (INT, DEFAULT 0): 조회수</li>
+  <li>regdate (DATETIME, DEFAULT NOW()): 게시물 작성 날짜 및 시간</li>
+</ul>
+
+<p>user</p>
+<ul>
+  <li>id (INT, PK, AI): 사용자의 고유 ID</li>
+  <li>username (VARCHAR(100), UNIQUE): 사용자 이름 (로그인 ID)</li>
+  <li>password (VARCHAR(100)): 사용자 비밀번호 (일반 로그인용)</li>
+  <li>name (VARCHAR(80)): 사용자 실명</li>
+  <li>email (VARCHAR(80), NULL): 사용자 이메일</li>
+  <li>regdate (DATETIME, DEFAULT NOW()): 회원가입 날짜 및 시간</li>
+  <li>provider (VARCHAR(40)): OAuth2 인증 제공자</li>
+  <li>providerId (VARCHAR(200)): OAuth2 제공자가 제공한 고유 사용자 ID</li>
+</ul>
+
+<p>user_authorities</p>
+<ul>
+  <li>user_id (INT, FK, PK): 사용자 ID, t5_user 테이블과의 외래 키 관계</li>
+  <li>authority_id (INT, FK, PK): 권한 ID, t5_authority 테이블과의 외래 키 관계</li>
+</ul>
+
+<h3>2. 테이블 간의 관계</h3>
+t5_user 와 t5_post: user_id가 외래 키로 설정되어 있으며, 한 사용자가 여러 게시물을 작성할 수 있는 일대다(1
+) 관계입니다.<br/>
+t5_post 와 t5_comment: post_id가 외래 키로 설정되어 있으며, 한 게시물에 여러 댓글이 달릴 수 있는 일대다(1
+) 관계입니다.<br/>
+t5_user 와 t5_comment: user_id가 외래 키로 설정되어 있으며, 한 사용자가 여러 댓글을 작성할 수 있는 일대다(1
+) 관계입니다.<br/>
+t5_post 와 t5_attachment: post_id가 외래 키로 설정되어 있으며, 한 게시물에 여러 첨부 파일이 있을 수 있는 일대다(1
+) 관계입니다.<br/>
+t5_user 와 t5_user_authorities: user_id가 외래 키로 설정되어 있으며, 한 사용자가 여러 권한을 가질 수 있는 다대다(N
+) 관계입니다.<br/> t5_user_authorities 테이블이 이를 위한 조인 테이블 역할을 합니다.<br/>
+t5_authority 와 t5_user_authorities: authority_id가 외래 키로 설정되어 있으며, 한 권한을 여러 사용자가 가질 수 있는 다대다(N
+) 관계입니다.<br/><br/><br/>
+
+<h1>개발 내용계</h1>
+
+<ul>
+  <li>게시판 프로젝트 명세서 정리</li>
+  <li>게시판 CRUD 구현</li>
+  <li>게시판 작성자만 삭제 수정 가능하게 하기</li>
+  <li>게시판 조회수 기능 추가</li>
+  <li>게시판 페이징 처리 구현</li>
+  <li>Security 회원가입 및 로그인 구현</li>
+  <li>회원가입 Validation 유효성 검사</li>
+  <li>회원가입 Validation 커스터마이징 중복 검사</li>
+  <li>Security 로그인 실패시 메시지 출력하기</li>
+  <li>OAuth 2.0 구글 로그인 구현</li>
+  <li>OAuth 2.0 네이버 로그인 구현</li>
+  <li>xml 매핑으로 글 작성자만 수정, 삭제 가능하게 하기</li>
+  <li>게시판 댓글 작성 및 조회 구현</li>
+  <li>게시판 댓글 수정 및 삭제 구현</li>
+  <li>게시판 댓글 작성자만 수정, 삭제 가능하게 하기</li>
+</ul>
